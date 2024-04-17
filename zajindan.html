@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>砸金蛋游戏</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .egg-container {
+      display: flex;
+      justify-content: space-between;
+      width: 300px;
+    }
+
+    .egg {
+      position: relative;
+      width: 100px;
+      height: 150px;
+      background-color: gold;
+      border-radius: 50%;
+      text-align: center;
+      line-height: 140px;
+      font-size: 24px;
+      cursor: pointer;
+      transition: background-color 0.3s ease-in-out;
+    }
+
+    .egg:hover {
+      background-color: orange;
+    }
+
+    .hammer {
+      position: absolute;
+      top: 60%;
+      left: 50%;
+      transform: translate(-50%, 0%);
+      pointer-events: none;
+      opacity: 0;
+      z-index: 1;
+    }
+
+    .hammer img {
+      width: 100px;
+      height: auto;
+    }
+
+    .reset-button {
+      margin-top: 20px;
+      font-size: 16px;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      background-color: #ccc;
+      cursor: pointer;
+      transition: background-color 0.3s ease-in-out;
+    }
+
+    .reset-button:hover {
+      background-color: #999;
+    }
+  </style>
+</head>
+<body>
+  <div class="egg-container">
+    <div class="egg">
+      🥚
+      <div class="hammer">
+        <img src="hammer.png" alt="锤子">
+      </div>
+    </div>
+    <div class="egg">
+      🥚
+      <div class="hammer">
+        <img src="hammer.png" alt="锤子">
+      </div>
+    </div>
+    <div class="egg">
+      🥚
+      <div class="hammer">
+        <img src="hammer.png" alt="锤子">
+      </div>
+    </div>
+  </div>
+
+  <button class="reset-button">复位</button>
+
+  <script>
+    const eggs = document.querySelectorAll('.egg');
+    const resetButton = document.querySelector('.reset-button');
+
+    eggs.forEach(egg => {
+      egg.addEventListener('click', () => {
+        smashEgg(egg);
+      });
+      egg.addEventListener('transitionend', () => {
+        checkResetEnabled();
+      });
+    });
+
+    resetButton.addEventListener('click', () => {
+      eggs.forEach(egg => {
+        resetEgg(egg);
+        
+      });
+      resetButton.disabled = true;
+    });
+    
+    function smashEgg(egg) {
+      if (egg.getAttribute('data-smashed') === 'true') {
+        return;
+      }
+      const prizes = ['💰', '🎁', '🍫', '🎉'];
+      const randomIndex = Math.floor(Math.random() * prizes.length);
+      const prize = prizes[randomIndex];
+      egg.innerHTML = prize;
+      egg.setAttribute('data-smashed', 'true');
+      egg.style.backgroundColor = 'gray';
+      egg.style.cursor = 'default';
+      const hammer = egg.querySelector('.hammer');
+      hammer.style.opacity = '1';
+      hammer.animate([
+        { transform: 'translate(-50%, 0px)' },
+        { transform: 'translate(-50%, -20px)' },
+        { transform: 'translate(-50%, 0px)' }
+      ], {
+        duration: 500,
+        easing: 'linear'
+      });
+      setTimeout(function() {
+        hammer.style.opacity = '0';
+      }, 500);
+    }
+
+    function resetEgg(egg) {
+      egg.innerHTML = '🥚';
+      egg.removeAttribute('data-smashed');
+      egg.style.backgroundColor = 'gold';
+      egg.style.cursor = 'pointer';
+      const hammer = egg.querySelector('.hammer');
+      hammer.style.opacity = '0';
+      checkResetEnabled();
+    }
+
+    function checkResetEnabled() {
+      let allSmashed = true;
+      eggs.forEach(egg => {
+        if (!egg.getAttribute('data-smashed')) {
+          allSmashed = false;
+        }
+      });
+      resetButton.disabled = !allSmashed;
+    }
+    
+  </script>
+</body>
+</html>
